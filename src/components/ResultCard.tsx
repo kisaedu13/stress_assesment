@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertCircle, ArrowUpRight, Gauge } from "lucide-react";
+import { AlertCircle, Gauge, Info, TrendingUp } from "lucide-react";
 import { KOSS_SOURCE } from "@/lib/koss43.questions";
 import {
   GENDER_LABELS,
@@ -26,95 +26,124 @@ const riskToneClassName: Record<RiskLevel, string> = {
 };
 
 export function ResultCard({ result }: ResultCardProps) {
+  const topDomains = result.priorityDomains.slice(0, 3);
+
   return (
-    <section className="grid gap-4">
-      <div className="grid gap-1">
+    <section className="grid gap-5 lg:sticky lg:top-6 lg:self-start">
+      <div className="grid gap-1.5">
         <p className="text-sm font-bold text-accent">KOSS 기준 요약</p>
-        <h1 className="text-[26px] font-bold leading-8 text-ink lg:text-[30px] lg:leading-9">
+        <h1 className="text-[30px] font-bold leading-9 text-ink sm:text-[34px] lg:text-[38px] lg:leading-[1.15]">
           직무스트레스 자가진단 결과
         </h1>
-        <p className="text-sm leading-6 text-muted lg:text-base">
-          우선 관리가 필요한 영역부터 확인하세요.
+        <p className="text-base font-medium leading-7 text-muted lg:text-lg lg:leading-8">
+          총점과 우선 개선 영역을 먼저 확인하세요.
         </p>
       </div>
 
-      <section className="rounded-[14px] border border-line bg-surface p-4 shadow-soft lg:p-6">
-        <div className="flex items-start gap-4">
-          <div className="flex min-w-0 flex-1 flex-col">
-            <p className="text-base font-bold text-muted">
-              {GENDER_LABELS[result.gender]} 기준 총점
-            </p>
-            <div className="mt-2 flex items-end gap-2">
-              <span className="text-[52px] font-bold leading-none text-accent lg:text-[64px]">
-                {result.totalScore.toFixed(1)}
+      <section className="overflow-hidden rounded-[18px] border border-line bg-surface shadow-soft">
+        <div className="grid gap-5 p-5 sm:p-6">
+          <div className="flex items-start justify-between gap-3 sm:gap-4">
+            <div className="min-w-0">
+              <p className="text-base font-bold text-muted">
+                {GENDER_LABELS[result.gender]} 기준 총점
+              </p>
+              <div className="mt-2 flex items-end gap-1.5 whitespace-nowrap sm:gap-2">
+                <span className="text-[56px] font-bold leading-none text-accent sm:text-[76px] lg:text-[84px]">
+                  {result.totalScore.toFixed(1)}
+                </span>
+                <span className="pb-1.5 text-base font-semibold text-muted sm:pb-2 sm:text-lg">
+                  / 100
+                </span>
+              </div>
+            </div>
+            <div className="flex h-14 w-14 flex-none items-center justify-center rounded-[18px] bg-accentSoft text-accent sm:h-20 sm:w-20 sm:rounded-[22px]">
+              <Gauge className="h-8 w-8 sm:h-10 sm:w-10" aria-hidden="true" />
+            </div>
+          </div>
+
+          <div className="grid gap-3 rounded-[14px] bg-surfaceSoft p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={`rounded-full px-3 py-1.5 text-base font-bold ${riskBadgeClassName[result.totalRiskLevel]}`}
+              >
+                {RISK_LABELS[result.totalRiskLevel]}
               </span>
-              <span className="pb-1 text-base font-semibold text-muted">
-                / 100
+              <span className="text-sm font-semibold text-muted">
+                공식 참고치 기준
               </span>
             </div>
-            <span
-              className={`mt-3 w-fit rounded-full px-3 py-1.5 text-sm font-bold ${riskBadgeClassName[result.totalRiskLevel]}`}
-            >
-              {RISK_LABELS[result.totalRiskLevel]}
-            </span>
-            <p className="mt-3 text-sm font-medium leading-6 text-muted lg:text-base lg:leading-7">
+            <p className="text-base font-medium leading-7 text-ink">
               {RISK_DESCRIPTIONS[result.totalRiskLevel]}
             </p>
           </div>
-          <div className="flex h-16 w-16 flex-none items-center justify-center rounded-[18px] bg-accentSoft text-accent lg:h-20 lg:w-20">
-            <Gauge className="h-8 w-8 lg:h-10 lg:w-10" aria-hidden="true" />
-          </div>
+        </div>
+
+        <div className="grid grid-cols-3 border-t border-line">
+          <span className="bg-successSoft px-3 py-3 text-center text-sm font-bold text-success">
+            정상
+          </span>
+          <span className="bg-warningSoft px-3 py-3 text-center text-sm font-bold text-warning">
+            경계
+          </span>
+          <span className="bg-riskSoft px-3 py-3 text-center text-sm font-bold text-risk">
+            고위험
+          </span>
         </div>
       </section>
 
-      <div className="grid grid-cols-3 gap-2">
-        <span className="rounded-xl bg-successSoft px-3 py-2.5 text-center text-sm font-bold text-success">
-          정상
-        </span>
-        <span className="rounded-xl bg-warningSoft px-3 py-2.5 text-center text-sm font-bold text-warning">
-          경계
-        </span>
-        <span className="rounded-xl bg-riskSoft px-3 py-2.5 text-center text-sm font-bold text-risk">
-          고위험
-        </span>
-      </div>
-
-      <section className="rounded-[14px] border border-line bg-surface p-[14px] shadow-soft lg:p-5">
+      <section className="rounded-[18px] border border-line bg-surface p-5 shadow-soft sm:p-6">
         <div className="flex items-center gap-2">
-          <ArrowUpRight className="h-5 w-5 text-accent" aria-hidden="true" />
-          <h2 className="text-base font-bold text-ink">우선 개선 영역 TOP 3</h2>
+          <TrendingUp className="h-6 w-6 text-accent" aria-hidden="true" />
+          <h2 className="text-xl font-bold text-ink">우선 개선 영역 TOP 3</h2>
         </div>
-        <div className="mt-3 grid gap-3">
-          {result.priorityDomains.slice(0, 3).map((domain, index) => (
-            <div className="flex items-center gap-3" key={domain.id}>
-              <span
-                className={`flex h-8 w-8 flex-none items-center justify-center rounded-lg text-sm font-bold ${riskBadgeClassName[domain.riskLevel]}`}
-              >
-                {index + 1}
-              </span>
-              <p className="min-w-0 flex-1 text-sm leading-6 text-ink lg:text-base lg:leading-7">
-                <span className="font-bold">{domain.label}</span>
-                <span className={`ml-1 font-bold ${riskToneClassName[domain.riskLevel]}`}>
+        <div className="mt-4 grid gap-3">
+          {topDomains.map((domain, index) => (
+            <article
+              className="grid gap-2 rounded-[14px] border border-line bg-surfaceSoft p-4"
+              key={domain.id}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    className={`flex h-9 w-9 flex-none items-center justify-center rounded-xl text-base font-bold ${riskBadgeClassName[domain.riskLevel]}`}
+                  >
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-lg font-bold leading-6 text-ink">
+                      {domain.label}
+                    </p>
+                    <p className="text-sm font-medium text-muted">
+                      {domain.itemCount}문항
+                    </p>
+                  </div>
+                </div>
+                <p className={`flex-none text-2xl font-bold ${riskToneClassName[domain.riskLevel]}`}>
                   {domain.score.toFixed(1)}
-                </span>
-                <span className="ml-1 text-muted">{domain.meaning}</span>
+                </p>
+              </div>
+              <p className="text-base font-medium leading-7 text-muted">
+                {domain.meaning}
               </p>
-            </div>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="flex gap-3 rounded-[14px] border border-[#E8CF9A] bg-warningSoft p-3">
+      <section className="flex gap-3 rounded-[16px] border border-[#E8CF9A] bg-warningSoft p-4">
         <AlertCircle className="mt-0.5 h-6 w-6 flex-none text-warning" />
-        <p className="text-sm font-medium leading-6 text-ink lg:text-base">
+        <p className="text-base font-medium leading-7 text-ink">
           본 결과는 KOSHA GUIDE 기준의 참고 평가이며, 의학적 진단이
           아닙니다.
         </p>
       </section>
 
-      <p className="text-[10px] leading-5 text-muted lg:text-xs lg:leading-6">
-        출처: {KOSS_SOURCE}
-      </p>
+      <section className="flex gap-3 rounded-[16px] border border-line bg-surfaceSoft p-4">
+        <Info className="mt-0.5 h-5 w-5 flex-none text-accent" />
+        <p className="text-xs leading-5 text-muted sm:text-sm sm:leading-6">
+          출처: {KOSS_SOURCE}
+        </p>
+      </section>
     </section>
   );
 }

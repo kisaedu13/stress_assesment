@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Check,
@@ -8,6 +8,7 @@ import {
   ClipboardList,
   LockKeyhole,
   Mars,
+  RotateCcw,
   ShieldCheck,
   UserRound,
   Venus,
@@ -113,7 +114,7 @@ export default function Home() {
 
   return (
     <main className="min-h-dvh bg-screen px-4 py-4 text-ink sm:px-6 sm:py-8 lg:px-8">
-      <div className="mx-auto w-full max-w-[960px] rounded-[26px] border border-line bg-screen shadow-soft">
+      <div className="mx-auto w-full max-w-[1120px] rounded-[26px] border border-line bg-screen shadow-soft">
         {step === "intro" ? (
           <IntroScreen onStart={() => setStep("privacy")} />
         ) : null}
@@ -168,15 +169,6 @@ export default function Home() {
         {step === "result" && result ? (
           <ResultScreen
             answeredCount={answeredCount}
-            onOpenFirstQuestion={() => {
-              setAnswers({});
-              setMissingIds([]);
-              setFormError(null);
-              setResult(null);
-              setCurrentQuestionIndex(0);
-              setCompletedQuestionCount(0);
-              setStep("survey");
-            }}
             onReset={handleReset}
             result={result}
           />
@@ -442,43 +434,41 @@ function GenderScreen({
 
 interface ResultScreenProps {
   answeredCount: number;
-  onOpenFirstQuestion: () => void;
   onReset: () => void;
   result: KossResult;
 }
 
 function ResultScreen({
   answeredCount,
-  onOpenFirstQuestion,
   onReset,
   result,
 }: ResultScreenProps) {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
+
   return (
     <section className="bg-screen">
-      <header className="flex h-14 items-center justify-between border-b border-line bg-surface px-4">
-        <div>
-          <p className="text-xs font-bold text-accent">
+      <header className="flex min-h-[76px] items-center justify-between gap-4 border-b border-line bg-surface px-4 py-3 sm:px-6">
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-accent">
             {answeredCount}개 문항 완료
           </p>
-          <p className="text-base font-bold text-ink">결과 대시보드</p>
+          <p className="text-xl font-bold leading-7 text-ink sm:text-2xl">
+            결과 대시보드
+          </p>
         </div>
         <button
-          className="rounded-xl border border-line bg-surface px-4 py-2.5 text-base font-bold text-ink transition hover:border-accent"
+          className="inline-flex min-h-[50px] flex-none items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2 text-base font-bold text-white shadow-[0_12px_26px_rgba(61,126,138,0.22)] transition hover:bg-accentStrong focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 sm:px-5 sm:text-lg"
           onClick={onReset}
           type="button"
         >
+          <RotateCcw className="h-5 w-5" aria-hidden="true" />
           다시하기
         </button>
       </header>
 
-      <div className="grid gap-4 p-5 sm:p-6 lg:grid-cols-2 lg:gap-6 lg:p-8">
-        <button
-          className="inline-flex min-h-[56px] items-center justify-center rounded-xl bg-accent px-5 text-lg font-bold text-white transition hover:bg-accentStrong focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 lg:col-span-2 lg:w-fit"
-          onClick={onOpenFirstQuestion}
-          type="button"
-        >
-          첫 설문 문항 보기
-        </button>
+      <div className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-6 lg:p-8">
         <ResultCard result={result} />
         <DomainScoreTable result={result} />
       </div>

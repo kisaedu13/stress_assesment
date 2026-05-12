@@ -1,9 +1,30 @@
+import {
+  BadgeDollarSign,
+  Briefcase,
+  Building2,
+  Coffee,
+  Network,
+  ShieldAlert,
+  SlidersHorizontal,
+  Users,
+} from "lucide-react";
 import { RISK_LABELS } from "@/lib/koss43.thresholds";
-import type { KossResult, RiskLevel } from "@/lib/koss43.types";
+import type { DomainId, KossResult, RiskLevel } from "@/lib/koss43.types";
 
 interface DomainScoreTableProps {
   result: KossResult;
 }
+
+const domainIcons: Record<DomainId, typeof Building2> = {
+  physicalEnvironment: Building2,
+  jobDemand: Briefcase,
+  jobControlDeficit: SlidersHorizontal,
+  interpersonalConflict: Users,
+  jobInsecurity: ShieldAlert,
+  organizationalSystem: Network,
+  lackOfReward: BadgeDollarSign,
+  occupationalClimate: Coffee,
+};
 
 const riskColorClassName: Record<RiskLevel, string> = {
   A: "text-success",
@@ -23,63 +44,87 @@ const riskSoftClassName: Record<RiskLevel, string> = {
   C: "bg-riskSoft text-risk",
 };
 
+const riskBorderClassName: Record<RiskLevel, string> = {
+  A: "border-success/20",
+  B: "border-warning/25",
+  C: "border-risk/25",
+};
+
 const shortRiskLabel = (riskLevel: RiskLevel) =>
   RISK_LABELS[riskLevel].replace(/^[A-C] \(|\)$/g, "");
 
 export function DomainScoreTable({ result }: DomainScoreTableProps) {
   return (
-    <section className="grid gap-3">
-      <div className="flex items-end justify-between">
-        <h2 className="text-lg font-bold text-ink">영역별 점수</h2>
-        <p className="text-sm text-muted">100점 환산</p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {result.domains.map((domain) => (
-          <article
-            className="min-w-0 rounded-[14px] border border-line bg-surface p-3 shadow-soft lg:p-4"
-            key={domain.id}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <p className="min-h-8 min-w-0 text-sm font-bold leading-5 text-ink lg:text-[15px] lg:leading-6">
-                {domain.shortLabel}
-              </p>
-              <p className={`flex-none text-lg font-bold lg:text-xl ${riskColorClassName[domain.riskLevel]}`}>
-                {domain.score.toFixed(1)}
-              </p>
-            </div>
-            <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-accentSoft">
-              <div
-                className={`h-full rounded-full ${riskBgClassName[domain.riskLevel]}`}
-                style={{ width: `${Math.min(100, Math.max(0, domain.score))}%` }}
-              />
-            </div>
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <span
-                className={`rounded-full px-2.5 py-1 text-xs font-bold ${riskSoftClassName[domain.riskLevel]}`}
-              >
-                {shortRiskLabel(domain.riskLevel)}
-              </span>
-              <span className="text-xs text-muted">
-                {domain.itemCount}문항
-              </span>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <section className="rounded-[14px] border border-line bg-surface p-[14px]">
-        <h2 className="text-base font-bold text-ink">영역별 해석</h2>
-        <div className="mt-3 grid gap-2 lg:grid-cols-2">
-          {result.domains.map((domain) => (
-            <p className="min-w-0 text-sm leading-6 text-muted lg:text-[15px] lg:leading-7" key={domain.id}>
-              <span className="font-bold text-ink">{domain.label}</span>
-              <span className="mx-1">·</span>
-              {domain.meaning}
-            </p>
-          ))}
+    <section className="grid gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <p className="text-sm font-bold text-accent">세부 결과</p>
+          <h2 className="text-2xl font-bold leading-8 text-ink">
+            8개 영역별 점수
+          </h2>
         </div>
-      </section>
+        <p className="rounded-full bg-surface px-3 py-1.5 text-sm font-semibold text-muted">
+          100점 환산
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        {result.domains.map((domain) => {
+          const Icon = domainIcons[domain.id];
+
+          return (
+            <article
+              className={`min-w-0 rounded-[18px] border bg-surface p-4 shadow-soft ${riskBorderClassName[domain.riskLevel]}`}
+              key={domain.id}
+            >
+              <div className="flex items-start gap-3">
+                <span className="flex h-11 w-11 flex-none items-center justify-center rounded-[14px] bg-accentSoft text-accent">
+                  <Icon className="h-6 w-6" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-bold leading-6 text-ink">
+                        {domain.label}
+                      </h3>
+                      <p className="mt-1 text-sm font-medium text-muted">
+                        {domain.itemCount}문항
+                      </p>
+                    </div>
+                    <p
+                      className={`flex-none text-[28px] font-bold leading-none ${riskColorClassName[domain.riskLevel]}`}
+                    >
+                      {domain.score.toFixed(1)}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-accentSoft">
+                    <div
+                      className={`h-full rounded-full ${riskBgClassName[domain.riskLevel]}`}
+                      style={{ width: `${Math.min(100, Math.max(0, domain.score))}%` }}
+                    />
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <span
+                      className={`rounded-full px-3 py-1.5 text-sm font-bold ${riskSoftClassName[domain.riskLevel]}`}
+                    >
+                      {shortRiskLabel(domain.riskLevel)}
+                    </span>
+                    <span className="text-sm font-medium text-muted">
+                      점수가 높을수록 주의가 필요합니다
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-base font-medium leading-7 text-muted">
+                    {domain.meaning}
+                  </p>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
     </section>
   );
 }
