@@ -169,12 +169,12 @@ export function SurveyForm({
         </section>
 
         {isMissing ? (
-          <p className="rounded-xl border border-risk/30 bg-riskSoft px-4 py-3 text-base font-bold text-risk">
+          <p className="mt-4 rounded-xl border border-risk/30 bg-riskSoft px-4 py-3 text-base font-bold text-risk">
             이 문항에 응답해 주세요.
           </p>
         ) : null}
 
-        <div className="mt-6 grid grid-cols-2 gap-3 pt-2">
+        <div className="mt-8 grid grid-cols-2 gap-3 pt-2">
           <button
             className="inline-flex min-h-[56px] items-center justify-center gap-2 rounded-xl border border-line bg-surface px-4 text-lg font-bold text-ink transition hover:border-accent focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
             disabled={safeIndex === 0}
